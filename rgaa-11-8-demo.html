@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RGAA 11.8 – Regroupement des items d'une liste de choix</title>
+  <style>
+    :root {
+      --texte: #1a1a1a;
+      --fond: #ffffff;
+      --accent: #0053b3;
+      --ok: #1e6b2f;
+      --ko: #a3130f;
+      --bordure: #767676;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      color: var(--texte);
+      background: var(--fond);
+      line-height: 1.5;
+      max-width: 52rem;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem;
+    }
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.25rem; margin-top: 2.5rem; }
+    .badge {
+      display: inline-block;
+      font-size: .85rem;
+      font-weight: 700;
+      padding: .1rem .5rem;
+      border-radius: .25rem;
+      color: #fff;
+      margin-left: .5rem;
+      vertical-align: middle;
+    }
+    .badge-ok { background: var(--ok); }
+    .badge-ko { background: var(--ko); }
+    section {
+      border: 1px solid var(--bordure);
+      border-radius: .5rem;
+      padding: 1rem 1.25rem 1.25rem;
+      margin-top: 1rem;
+    }
+    label, .label { display: block; font-weight: 600; margin-bottom: .4rem; }
+    select {
+      font-size: 1rem;
+      padding: .4rem;
+      min-width: 16rem;
+      border: 1px solid var(--bordure);
+      border-radius: .25rem;
+    }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    .note { font-size: .95rem; }
+    code { background: #f2f2f2; padding: 0 .25rem; border-radius: .2rem; }
+
+    /* Liste de choix ARIA (exemple 3) */
+    .listbox {
+      width: 16rem;
+      max-height: 18rem;
+      overflow-y: auto;
+      border: 1px solid var(--bordure);
+      border-radius: .25rem;
+      padding: .25rem 0;
+    }
+    .group-label {
+      font-weight: 700;
+      padding: .3rem .75rem;
+      background: #eeeeee;
+    }
+    [role="option"] {
+      padding: .3rem .75rem .3rem 1.5rem;
+      cursor: pointer;
+    }
+    [role="option"].active { outline: 2px solid var(--accent); outline-offset: -2px; }
+    [role="option"][aria-selected="true"] { background: var(--accent); color: #fff; }
+    .resultat { margin-top: .5rem; }
+  </style>
+</head>
+<body>
+
+<h1>Critère 11.8 – Les items de même nature d'une liste de choix sont-ils regroupés de manière pertinente&nbsp;?</h1>
+<p>Page de démonstration pour lecteur d'écran (NVDA, JAWS, VoiceOver). Chaque exemple propose la même liste de pays, regroupés par continent.</p>
+
+<!-- ============================================================ -->
+<h2>Exemple 1 – Liste native avec <code>optgroup</code> <span class="badge badge-ok">Conforme</span></h2>
+<section aria-labelledby="titre-ex1">
+  <p id="titre-ex1" class="note">Tests 11.8.1, 11.8.2 et 11.8.3 validés : les groupes utilisent <code>&lt;optgroup&gt;</code> avec un attribut <code>label</code> pertinent.</p>
+
+  <label for="pays-ok">Pays de destination</label>
+  <select id="pays-ok" name="pays-ok">
+    <optgroup label="Europe">
+      <option value="fr">France</option>
+      <option value="es" selected>Espagne</option>
+      <option value="it">Italie</option>
+      <option value="uk">Royaume-Uni</option>
+    </optgroup>
+    <optgroup label="Amérique">
+      <option value="ca">Canada</option>
+      <option value="us">États-Unis</option>
+    </optgroup>
+    <optgroup label="Asie">
+      <option value="cn">Chine</option>
+      <option value="jp">Japon</option>
+    </optgroup>
+  </select>
+
+  <p class="note"><strong>À écouter :</strong> en parcourant la liste, le lecteur d'écran annonce le nom du groupe (ex.&nbsp;« Europe, groupe ») avant ou avec l'option.</p>
+</section>
+
+<!-- ============================================================ -->
+<h2>Exemple 2 – Faux regroupement visuel <span class="badge badge-ko">Non conforme</span></h2>
+<section aria-labelledby="titre-ex2">
+  <p id="titre-ex2" class="note">Échec au test 11.8.1 : les continents sont de simples <code>&lt;option disabled&gt;</code>. Visuellement c'est regroupé, mais aucune relation de groupe n'est transmise aux technologies d'assistance.</p>
+
+  <label for="pays-ko">Pays de destination</label>
+  <select id="pays-ko" name="pays-ko">
+    <option disabled>— Europe —</option>
+    <option value="fr">France</option>
+    <option value="es" selected>Espagne</option>
+    <option value="it">Italie</option>
+    <option value="uk">Royaume-Uni</option>
+    <option disabled>— Amérique —</option>
+    <option value="ca">Canada</option>
+    <option value="us">États-Unis</option>
+    <option disabled>— Asie —</option>
+    <option value="cn">Chine</option>
+    <option value="jp">Japon</option>
+  </select>
+
+  <p class="note"><strong>À écouter :</strong> les options sont annoncées sans leur groupe ; le nombre d'éléments (« 2 sur 11 ») inclut les intitulés, et les « — Europe — » sont lus comme des options indisponibles.</p>
+</section>
+
+<!-- ============================================================ -->
+<h2>Exemple 3 – Liste de choix ARIA avec <code>role="group"</code> <span class="badge badge-ok">Conforme</span></h2>
+<section aria-labelledby="titre-ex3">
+  <p id="titre-ex3" class="note">Version personnalisée : chaque groupe porte <code>role="group"</code> et un nom accessible via <code>aria-labelledby</code>. Navigation : flèches haut/bas, Début/Fin, Entrée ou Espace pour sélectionner.</p>
+
+  <div class="label" id="pays-aria-label">Pays de destination</div>
+  <div id="pays-aria"
+       class="listbox"
+       role="listbox"
+       tabindex="0"
+       aria-labelledby="pays-aria-label">
+
+    <div role="group" aria-labelledby="grp-europe">
+      <div class="group-label" id="grp-europe" role="presentation">Europe</div>
+      <div role="option" id="opt-fr" aria-selected="false">France</div>
+      <div role="option" id="opt-es" aria-selected="true">Espagne</div>
+      <div role="option" id="opt-it" aria-selected="false">Italie</div>
+      <div role="option" id="opt-uk" aria-selected="false">Royaume-Uni</div>
+    </div>
+
+    <div role="group" aria-labelledby="grp-amerique">
+      <div class="group-label" id="grp-amerique" role="presentation">Amérique</div>
+      <div role="option" id="opt-ca" aria-selected="false">Canada</div>
+      <div role="option" id="opt-us" aria-selected="false">États-Unis</div>
+    </div>
+
+    <div role="group" aria-labelledby="grp-asie">
+      <div class="group-label" id="grp-asie" role="presentation">Asie</div>
+      <div role="option" id="opt-cn" aria-selected="false">Chine</div>
+      <div role="option" id="opt-jp" aria-selected="false">Japon</div>
+    </div>
+  </div>
+  <p class="resultat" aria-live="polite">Sélection : <strong id="pays-aria-valeur">Espagne</strong></p>
+</section>
+
+<script>
+  (function () {
+    var listbox = document.getElementById('pays-aria');
+    var options = Array.prototype.slice.call(listbox.querySelectorAll('[role="option"]'));
+    var valeur = document.getElementById('pays-aria-valeur');
+    var index = options.findIndex(function (o) { return o.getAttribute('aria-selected') === 'true'; });
+    if (index < 0) index = 0;
+
+    function activer(i) {
+      options.forEach(function (o) { o.classList.remove('active'); });
+      index = Math.max(0, Math.min(options.length - 1, i));
+      var opt = options[index];
+      opt.classList.add('active');
+      listbox.setAttribute('aria-activedescendant', opt.id);
+      opt.scrollIntoView({ block: 'nearest' });
+    }
+
+    function selectionner(i) {
+      options.forEach(function (o) { o.setAttribute('aria-selected', 'false'); });
+      options[i].setAttribute('aria-selected', 'true');
+      valeur.textContent = options[i].textContent;
+      activer(i);
+    }
+
+    listbox.addEventListener('focus', function () { activer(index); });
+
+    listbox.addEventListener('keydown', function (e) {
+      switch (e.key) {
+        case 'ArrowDown': e.preventDefault(); selectionner(Math.min(options.length - 1, index + 1)); break;
+        case 'ArrowUp':   e.preventDefault(); selectionner(Math.max(0, index - 1)); break;
+        case 'Home':      e.preventDefault(); selectionner(0); break;
+        case 'End':       e.preventDefault(); selectionner(options.length - 1); break;
+        case 'Enter':
+        case ' ':         e.preventDefault(); selectionner(index); break;
+      }
+    });
+
+    options.forEach(function (opt, i) {
+      opt.addEventListener('click', function () {
+        selectionner(i);
+        listbox.focus();
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
